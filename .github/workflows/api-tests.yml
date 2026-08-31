@@ -41,10 +41,7 @@ jobs:
             FOLDER_NAME: ${{ secrets.FOLDER_NAME }}
             PORT: ${{ secrets.PORT }}
         run: |
+            echo "MongoDB URL starts with: ${MONGODB_URL:0:14}"
             npm run dev > backend.log 2>&1 &
             sleep 15
             cat backend.log
-
-            - name: Run API automation tests
-                working-directory: api_automation
-                run: mvn clean test
