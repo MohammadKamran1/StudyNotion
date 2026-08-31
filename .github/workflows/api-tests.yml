@@ -38,6 +38,7 @@ jobs:
         run: |
           nohup npm run dev > backend.log 2>&1 &
           sleep 10
+          cat backend.log
 
       - name: Run API automation tests
         working-directory: api_automation
