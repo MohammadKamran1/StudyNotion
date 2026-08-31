@@ -1,0 +1,44 @@
+name: StudyNotion API Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  api-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '23'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        working-directory: Server
+        run: npm install
+
+      - name: Start backend
+        working-directory: Server
+        run: |
+          nohup npm run dev > backend.log 2>&1 &
+          sleep 10
+
+      - name: Run API automation tests
+        working-directory: api_automation
+        run: mvn clean test
