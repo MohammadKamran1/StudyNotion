@@ -25,7 +25,7 @@ exports.sendOTP = async(req,res) => {
             specialChars: false
         });
 
-        const result = await OTP.findOne({otp:otp});
+        var result = await OTP.findOne({otp:otp});
 
         while(result){
             otp = otpGenerator.generate(6, {
@@ -33,18 +33,21 @@ exports.sendOTP = async(req,res) => {
                 lowerCaseAlphabets: false,
                 specialChars: false
             });
-            const result = await OTP.findOne({otp:otp});
+            result = await OTP.findOne({otp:otp});
         }
 
         const otpPayload = {email,otp};
         console.log(otpPayload);
 
-        const otpBody = await OTP.create(payload);
-        console.log(otpBody);
+        const otpBody = await OTP.create(otpPayload);
+        console.log("OTP BODY",otpBody);
+
+        await OTP.findOne({ email }).sort({ createdAt: -1 });
 
         return res.status(200).json({
             success:true,
-            message:"OTP Sent Successfully"
+            message:"OTP Sent Successfully",
+            otp
         })
     }
     catch(error){
@@ -57,6 +60,7 @@ exports.sendOTP = async(req,res) => {
 }
 
 exports.signUp = async(req,res) => {
+    console.log("SIGNUP CONTROLLER HIT");
     try{
         const {firstName,
             lastName,
@@ -64,7 +68,7 @@ exports.signUp = async(req,res) => {
             accountType,
             password,
             confirmPassword,
-            contactNumber,
+            // contactNumber,
             otp
         } = req.body;
 
@@ -91,9 +95,9 @@ exports.signUp = async(req,res) => {
             })
         }
 
-        const recentOtp = OTP.findOne({email}).sort({createdAt:-1}).limit(1);
+        const recentOtp = await OTP.findOne({email}).sort({createdAt:-1});
 
-        if(recentOtp.length == 0){
+        if(!recentOtp){
             return res.status(400).json({
                 success:false,
                 message:"OTP Not Found"
@@ -111,14 +115,14 @@ exports.signUp = async(req,res) => {
             gender:null,
             dateOfBirth:null,
             about:null,
-            contactNumber
+            // contactNumber
         });
 
         const user = await User.create({
             firstName,
             lastName,
             email,
-            contactNumber,
+            // contactNumber,
             password:hashedPassword,
             accountType,
             additionalDetails: profileDetails._id,
@@ -132,10 +136,10 @@ exports.signUp = async(req,res) => {
         });
     }
     catch(error){
-        console.log(error);
+        console.log("Error",error);
         return res.status(500).json({
             success:false,
-            error:error.message
+            error:error.message,
         })
     }
 }
@@ -153,6 +157,8 @@ exports.login = async(req,res) => {
 
         const user = await User.findOne({email});
 
+        console.log("User Found", user);
+
         if(!user){
             return res.status(403).json({
                 success:false,
@@ -161,7 +167,7 @@ exports.login = async(req,res) => {
         }
 
         if(await bcrypt.compare(password, user.password)){
-            const paylaod = {
+            const payload = {
                 email: user.email,
                 id: user._id,
                 accountType: user.accountType
@@ -176,7 +182,7 @@ exports.login = async(req,res) => {
                 httpOnly:true
             }
 
-            res.cookie("token", token, options).status(200).json({
+            return res.cookie("token", token, options).status(200).json({
                 success:true,
                 token,
                 user,
@@ -199,15 +205,15 @@ exports.login = async(req,res) => {
     }
 }
 
-exports.changePassword = async(req,res) => {
-    try{
+// exports.changePassword = async(req,res) => {
+//     try{
 
-    }
-    catch(error){
-        console.log(error);
-        return res.status(500).json({
-            success:false,
-            error:error.message
-        })
-    }
-}
+//     }
+//     catch(error){
+//         console.log(error);
+//         return res.status(500).json({
+//             success:false,
+//             error:error.message
+//         })
+//     }
+// }

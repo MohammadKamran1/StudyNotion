@@ -8,6 +8,8 @@ exports.updateProfile = async(req,res) => {
 
         const userId = req.user.id;
 
+        console.log("UserId", userId);
+
         if(!contactNumber || !gender){
             return res.status(400).json({
                 success:false,

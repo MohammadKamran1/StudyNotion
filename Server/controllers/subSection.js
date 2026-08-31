@@ -50,3 +50,29 @@ exports.createSubSection = async(req,res) => {
         })
     }
 }
+
+exports.updateSubSection = async(req,res) => {
+    try{
+        const {subSectionId, title, timeDuration, description} = req.body;
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            error:error.message
+        })
+    }
+}
+
+exports.deleteSubSection = async(req,res) => {
+    try{
+        const {subSectionId} = req.body;
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({
+            success:false,
+            error:error.message
+        })
+    }
+}

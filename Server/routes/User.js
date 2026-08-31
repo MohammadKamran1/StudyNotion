@@ -23,10 +23,10 @@ const { auth } = require("../middlewares/auth")
 // ********************************************************************************************************
 
 // Route for user login
-router.post("/login", login)
+router.post("/login", login);
 
 // Route for user signup
-router.post("/signup", signUp)
+router.post("/signup", signUp);
 
 // Route for sending OTP to the user's email
 router.post("/sendotp", sendOTP)
